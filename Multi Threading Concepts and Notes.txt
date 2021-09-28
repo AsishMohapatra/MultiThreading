@@ -1,0 +1,161 @@
+1. Thread Name can be set only once as below.
+Setting again will throw InvalidOperationException.
+
+Thread t=new Thread(Print);
+t.Name="New Thread" // Ok
+t.Name="Rename Again" //Exception.
+
+2. How to access the name of executing Thread.
+
+Thread.CurrentThread.Name
+
+3. CLR assigns each thread its own local memory stack for local variables.
+Threads share Heap variables.
+
+
+
+4.Preempted Thread =>  Thread that has execution interupted,
+usually by external factor such as timeslicing
+
+5.lock(syncObject) => Every other thread has to wait for the thread that has the lock to finish the block of code.
+
+6.Every thread creation takes 100ms and takes 1Mb memory.
+Takes more time for recycling and cleaning up.
+
+7. ThreadPool threads are background threads (Main thread dies all background thread dies)
+Thread t=new Thread(Print){IsBackGround=true}
+
+ThreadPool limits the maximum number of threads that can run simultaneously.
+When limit achieves then jobs are queued and only begin when some other jobs finish.
+
+Thread.CurrentThread.IsThreadPoolThread => tells if thread pool thread.
+
+ThreadPool.QueueUserWorkItem(new WaitCallback(PrintNTimesWithNoParam), 5);
+
+8.How to Enter into the ThreadPool thread ?
+-------------------------------------------
+Task Parallel Library
+Asynchronous delegate
+BackGroundworker
+ThreadPool.QueuUserWorkItems
+
+9. How to wait for main thread or other thread to wait for another Thread.
+----------------------------------------------------------------------------
+Thread.Join => This can be used if the thread has been created by you.
+ManualResetEvent if its a ThreadPool thread.
+
+Example
+-------
+private static ManualResetEvent resetEvent = new ManualResetEvent(false);
+resetEvent.WaitOne(); => For waiting
+resetEvent.Set(); => Set the state to signaled.
+
+10.Exception Handling in Threading
+------------------------------------
+Exception handling is per Thread.
+This means exception from a worker thread wont be caught in the main thread catch block.
+
+Easy Solution => Use try catch inside the function that is being executed in the thread.
+
+11. Return value from a Thread
+------------------------------
+1. Returning value can happen only using a shared variable.
+Like Producer Consumer queue.
+
+12. Task
+----------
+1.Task is a higher level constructs.
+2. Returns the value using Result Property
+3.Chained
+4.Use ThreadPool thread
+
+ Task<string> taskThatReturns = new Task<string>(ExecuteTaskAndReturns);
+            taskThatReturns.Start();
+            Console.WriteLine(taskThatReturns.Result);
+			
+Task<string> taskfromFactory=Task.Factory.StartNew(()=>{});
+taskfromFactory.Result
+
+Exception Handling when using a task
+--------------------------------------
+Task.REsult for returning value
+But if a task thows exception then Result Proeprty throws the Aggregationaggregate .
+task.Wait() => If you want to wait before the Result evaluated.
+
+Task with Continuation
+-----------------------
+Can be done by callback in normal thread.
+Data / Exception can be passed fromantecedent task to continuation task
+Control / Cancel the continuation
+Invoke multiple continuation
+
+Task.Delay(100)
+
+Synchronization
+---------------
+1. Blocking Methods
+-------------------------
+  => Sleep / Joins / Task.Wait
+
+Blocks thread dont consume CPU , It allows CPU to do something else.
+Blocked thread consume memory.
+
+Spinning  => Consumes CPU example while loop we will continue to use CPU resources.
+
+2.Locks
+-----------
+ => Limits number of thread for executing certian section of code.
+Nestedlock => Creates dead lock
+** Exclusive lock => 
+only 1 thread to access certain section of code.
+
+Monitor.Enter means Monitor.Exit.
+
+As we always need to exist using MOnitor.Exit(objectLock) this means we should
+use the try catch finally block
+
+Mutex => 
+Mutex mutex=new Mutex(false);
+false => Thread creating instance of mutex class wont have ownership
+True  => means thread aquited the mutex
+
+Name Of the mutex => To make it available computer wide.
+
+**Non exclusive locks
+-------------------
+Semaphore  => Max count 1 is equivalent to Mutex
+SemaphoreSlim 
+Reader/Writer => Allows multiple threads to read but write only 1 thread.
+ReaderWriterLocSlim class
+EnterRead / ExitRead
+EnterWrite / ExitWrite
+
+Allow multiple threads to access a resource.
+
+
+
+Signaling Constructs
+--------------------
+Thread A wants to do something after Thread B finish some work.
+
+** Event Wait Hanldes =>
+** Monitor Wait Pulse methods
+
+** Countdown
+** Barriers
+
+
+Non Blocking
+------------ 
+Thread.MemoryBarrier
+VolatileRead
+VolatileWrite
+Interlock
+
+Protect access to common fields
+
+
+
+Async Await
+-----------
+
